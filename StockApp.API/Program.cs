@@ -1,9 +1,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Models;
 using StockApp.Infra.IoC;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using StockApp.Application.Middlewares;
+using StockApp.Application.Interfaces;
+using StockApp.Application.Services;
+using StockApp.Infra.Data.Services;
+using StockApp.Application.Repositories;
 
 internal class Program
 {
@@ -20,6 +26,7 @@ internal class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddScoped<IUserRepository, UserRepository> ();
         builder.Services.AddScoped<IAuthService, AuthService> ();
+        builder.Services.AddScoped<IJustInTimeInventoryService, JustInTimeInventoryService> ();
 
         //Configuração JWT Authentication
 
@@ -38,8 +45,8 @@ internal class Program
                     ValidateIssuer = true,
                     ValidateAudience = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = builder.Configuration(["Jwt:Issuer"]),
-                    ValidAudience = builder.Configuration(["Jwt:Audience"]),
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
 
